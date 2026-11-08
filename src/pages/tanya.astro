@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site, faq, wa } from '../data/site.js';
+
+const generic = wa(`Halo ${site.name}, saya mau tanya-tanya dulu.`);
+---
+
+<Layout title="Tanya jawab">
+  <section class="page-head">
+    <p class="meta">Tanya jawab</p>
+    <h1 data-reveal>Kebiasaan kecil yang sering ditanyakan.</h1>
+  </section>
+
+  <section class="faq page-faq">
+    <div class="faq-list">
+      {faq.items.map((it) => (
+        <details class="qa" name="faq">
+          <summary>
+            <span class="qa-q">{it.q}</span>
+            <span class="qa-plus" aria-hidden="true"></span>
+          </summary>
+          <p class="qa-a">{it.a}</p>
+        </details>
+      ))}
+    </div>
+    <p class="faq-more">Pertanyaanmu belum terjawab? <a href={generic}>Tanya langsung lewat WhatsApp</a> — jawabannya bukan template.</p>
+  </section>
+</Layout>

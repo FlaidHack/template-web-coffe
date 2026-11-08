@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site, order, wa } from '../data/site.js';
+
+const generic = wa(`Halo ${site.name}, saya mau pesan kopi. Atas nama: `);
+---
+
+<Layout title="Pesan">
+  <section class="order">
+    <div class="order-wrap">
+      <div class="order-head">
+        <p class="meta">Pesan</p>
+        <h1 data-reveal>{order.heading}</h1>
+        <p class="note" data-reveal style="--d:1">{order.text}</p>
+        <dl class="order-info">
+          <div><dt>Jam</dt><dd>{site.hours}</dd></div>
+          <div><dt>Alamat</dt><dd>{site.address}</dd></div>
+          <div><dt>Telepon</dt><dd><a href={generic}>{site.phoneShown}</a></dd></div>
+        </dl>
+      </div>
+      <form class="order-form" data-coupon data-wa={site.whatsapp} data-shop={site.name}>
+        {order.fields.map(([id, label, ph]) => (
+          <div class="fld">
+            <label for={`f-${id}`}>{label}</label>
+            <input id={`f-${id}`} name={id} type="text" placeholder={ph} autocomplete="off" />
+          </div>
+        ))}
+        <button class="submit" type="submit"><span>{order.button}</span><svg viewBox="0 0 14 10" width="14" height="10" aria-hidden="true"><path d="M0 5h12M8 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // form: isi kolom, buka WhatsApp dengan pesan penuh
+  const form = document.querySelector<HTMLFormElement>('[data-coupon]');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const d = new FormData(form);
+      const v = (k: string) => String(d.get(k) ?? '').trim();
+      const lines = [
+        `Halo ${form.dataset.shop}, saya mau pesan kopi:`,
+        `Nama: ${v('nama') || '-'}`,
+        `Pesanan: ${v('pesanan') || '-'}`,
+        `Kota: ${v('kota') || '-'}`,
+        v('catatan') ? `Catatan: ${v('catatan')}` : '',
+      ].filter(Boolean);
+      const url = `https://wa.me/${form.dataset.wa}?text=${encodeURIComponent(lines.join('\n'))}`;
+      window.open(url, '_blank', 'noopener');
+    });
+  }
+</script>

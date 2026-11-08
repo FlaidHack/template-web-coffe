@@ -1,0 +1,67 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site, menuCats, menu, wa, rupiah } from '../data/site.js';
+
+const generic = wa(`Halo ${site.name}, saya mau pesan kopi. Atas nama: `);
+const dishLink = (it) => wa(`Halo ${site.name}, saya mau pesan ${it.name} (reguler). Atas nama: `);
+---
+
+<Layout title="Menu">
+  <section class="page-head">
+    <p class="meta">Menu</p>
+    <h1 data-reveal>Setiap gelas, diseduh hari ini.</h1>
+    <p class="note" data-reveal style="--d:1">Harga mulai dari ukuran reguler. Batok? Untuk diambil atau diantar — sama saja segarnya.</p>
+  </section>
+
+  <section class="menu-sec" data-menu>
+    <div class="menu-layout">
+      <aside class="cat-bar">
+        <button type="button" class="cat-link" data-catlink="all" aria-pressed="true">Semua</button>
+        {menuCats.map((c) => (
+          <button type="button" class="cat-link" data-catlink={c} aria-pressed="false">{c}</button>
+        ))}
+      </aside>
+
+      <div class="dish-grid dish-grid-3">
+        {menu.items.map((it, i) => (
+          <a class="dish" data-cat={it.cat} href={dishLink(it)} data-reveal style={`--d:${i % 3}`}>
+            <span class="dish-img">
+              <img src={it.image} alt={it.name} width="800" height="800" loading="lazy" />
+            </span>
+            <span class="dish-body">
+              <span class="dish-name">{it.name}</span>
+              <span class="dish-desc">{it.desc}</span>
+              <span class="dish-price">Mulai dari {rupiah(it.price)}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="strip">
+    <div class="strip-in">
+      <div>
+        <h2>Bingung pilih?</h2>
+        <p>Ceritakan seleramu lewat WhatsApp, nanti kami bantu pilihkan — atau biarkan barista yang menentukan.</p>
+      </div>
+      <a class="btn" href={generic}><span>Tanya dulu</span><svg viewBox="0 0 14 10" width="14" height="10" aria-hidden="true"><path d="M0 5h12M8 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // menu: filter kartu berdasarkan kategori
+  const cat = document.querySelector<HTMLElement>('[data-menu]');
+  if (cat) {
+    const links = cat.querySelectorAll<HTMLButtonElement>('[data-catlink]');
+    const dishes = cat.querySelectorAll<HTMLAnchorElement>('[data-cat]');
+    links.forEach((l) => {
+      l.addEventListener('click', () => {
+        const k = l.dataset.catlink!;
+        links.forEach((b) => b.setAttribute('aria-pressed', String(b === l)));
+        dishes.forEach((d) => (d.hidden = k !== 'all' && d.dataset.cat !== k));
+      });
+    });
+  }
+</script>

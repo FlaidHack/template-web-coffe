@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site, hero, menuCats, menu, letter, wa, rupiah } from '../data/site.js';
+
+const generic = wa(`Halo ${site.name}, saya mau tanya-tanya dulu.`);
+const favors = menu.items.filter((it) => it.cat === 'Kopi').slice(0, 3);
+const dishLink = (it) => wa(`Halo ${site.name}, saya mau pesan ${it.name} (reguler). Atas nama: `);
+---
+
+<Layout title="Profil">
+  <section class="hero">
+    <div class="hero-wrap">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <h1>
+            <span>{hero.headline[0]}</span>
+            <span class="h-italic">{hero.headline[1]}</span>
+          </h1>
+          <p class="lede">{hero.text}</p>
+          <a class="btn" href="/menu"><span>{hero.cta}</span><svg viewBox="0 0 14 10" width="14" height="10" aria-hidden="true"><path d="M0 5h12M8 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+        </div>
+
+        <div class="hero-figure">
+          <figure class="frame">
+            <img src={hero.image} alt={hero.alt} width="1000" height="1000" fetchpriority="high" />
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="letter">
+    <div class="letter-inner" data-reveal>
+      <img class="avatar" src={letter.image} alt={letter.alt} width="88" height="88" loading="lazy" />
+      <div class="letter-paras">
+        {letter.paragraphs.map((p) => (<p>{p}</p>))}
+      </div>
+      <p class="sign">
+        <span class="sign-name">{letter.name}</span>
+        <span class="sign-role">{letter.role}</span>
+      </p>
+      <a class="letter-link" href={generic}>{letter.stripText} {site.phoneShown}<svg viewBox="0 0 14 10" width="14" height="10" aria-hidden="true"><path d="M0 5h12M8 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+    </div>
+  </section>
+
+  <section class="menu-teaser">
+    <div class="section-head">
+      <p class="meta">Menu favorit</p>
+      <h2 data-reveal>Paling sering dipesan</h2>
+    </div>
+    <div class="dish-grid dish-grid-3">
+      {favors.map((it, i) => (
+        <a class="dish" href={dishLink(it)} data-reveal style={`--d:${i}`} data-cat={it.cat}>
+          <span class="dish-img">
+            <img src={it.image} alt={it.name} width="800" height="800" loading="lazy" />
+          </span>
+          <span class="dish-body">
+            <span class="dish-name">{it.name}</span>
+            <span class="dish-desc">{it.desc}</span>
+            <span class="dish-price">Mulai dari {rupiah(it.price)}</span>
+          </span>
+        </a>
+      ))}
+    </div>
+    <a class="t-link" href="/menu">Lihat semua menu<svg viewBox="0 0 14 10" width="14" height="10" aria-hidden="true"><path d="M0 5h12M8 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+  </section>
+
+  <section class="strip">
+    <div class="strip-in">
+      <div>
+        <h2>Mampir, atau pesan dulu.</h2>
+        <p>{site.hours} · {site.address}</p>
+      </div>
+      <a class="btn" href="/pesan"><span>Isi form pesan</span><svg viewBox="0 0 14 10" width="14" height="10" aria-hidden="true"><path d="M0 5h12M8 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+    </div>
+  </section>
+</Layout>

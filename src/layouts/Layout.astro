@@ -1,0 +1,92 @@
+---
+import '@fontsource-variable/newsreader/opsz.css';
+import '@fontsource-variable/newsreader/opsz-italic.css';
+import '@fontsource-variable/hanken-grotesk';
+import '../styles/main.css';
+import { site, footer, wa } from '../data/site.js';
+
+const { title } = Astro.props;
+
+const links = [
+  ['Beranda', '/'],
+  ['Menu', '/menu'],
+  ['Pesan', '/pesan'],
+  ['Tanya jawab', '/tanya'],
+];
+const cur = Astro.url.pathname.replace(/\/$/, '') || '/';
+const generic = wa(`Halo ${site.name}, saya mau tanya-tanya dulu.`);
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ? `${title} — ${site.name}` : site.title}</title>
+    <meta name="description" content={site.description} />
+    <meta name="theme-color" content="#161009" />
+    <meta property="og:title" content={site.title} />
+    <meta property="og:description" content={site.description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body id="atas">
+    <a class="skip" href="#isi">Lompat ke isi halaman</a>
+
+    <header class="topbar">
+      <div class="topbar-in">
+        <a class="brand" href="/"><em>Yu</em>Coffe</a>
+        <nav aria-label="Menu utama">
+          {links.map(([t, h]) => (<a href={h} class={h === cur ? 'is-current' : ''}>{t}</a>))}
+        </nav>
+      </div>
+    </header>
+
+    <main id="isi">
+      <slot />
+    </main>
+
+    <footer class="foot">
+      <div class="foot-wrap">
+        <div class="foot-top">
+          <a class="brand" href="/"><em>Yu</em>Coffe</a>
+          <div class="foot-notes">
+            {footer.notes.map((n) => (<p>{n}</p>))}
+          </div>
+          <a class="totop" href="#atas">Kembali ke atas</a>
+        </div>
+        <p class="foot-kicker">Pesan langsung — WhatsApp</p>
+        <a class="foot-big" href={generic} aria-label={`Hubungi lewat WhatsApp ${site.phoneShown}`}>{site.phoneShown}</a>
+        <div class="foot-meta">
+          <nav aria-label="Menu bawah">
+            {links.map(([t, h]) => (<a href={h}>{t}</a>))}
+          </nav>
+          <p class="end">{site.city}, {new Date().getFullYear()}</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Bagian halaman muncul perlahan saat masuk layar. Tanpa JavaScript, semuanya langsung terlihat.
+      const items = document.querySelectorAll('[data-reveal]');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('in');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.06 }
+        );
+        items.forEach((el) => io.observe(el));
+      } else {
+        items.forEach((el) => el.classList.add('in'));
+      }
+    </script>
+  </body>
+</html>
