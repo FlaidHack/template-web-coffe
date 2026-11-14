@@ -2,8 +2,10 @@
 import Layout from '../layouts/Layout.astro';
 import { site, menuCats, menu, wa, rupiah } from '../data/site.js';
 
+type MenuItem = (typeof menu.items)[number];
+
 const generic = wa(`Halo ${site.name}, saya mau pesan kopi. Atas nama: `);
-const dishLink = (it) => wa(`Halo ${site.name}, saya mau pesan ${it.name} (reguler). Atas nama: `);
+const dishLink = (it: MenuItem) => wa(`Halo ${site.name}, saya mau pesan ${it.name} (reguler). Atas nama: `);
 ---
 
 <Layout title="Menu">
@@ -63,5 +65,9 @@ const dishLink = (it) => wa(`Halo ${site.name}, saya mau pesan ${it.name} (regul
         dishes.forEach((d) => (d.hidden = k !== 'all' && d.dataset.cat !== k));
       });
     });
+
+    // tautan dari beranda: /menu#Kopi langsung membuka kategorinya
+    const want = decodeURIComponent(location.hash.slice(1));
+    if (want) links.forEach((l) => l.dataset.catlink === want && l.click());
   }
 </script>

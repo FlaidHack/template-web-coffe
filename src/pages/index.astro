@@ -1,31 +1,102 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { site, hero, menuCats, menu, letter, wa, rupiah } from '../data/site.js';
+import { site, hero, shelf, menuCats, menu, letter, wa, rupiah } from '../data/site.js';
+
+type MenuItem = (typeof menu.items)[number];
+type HeroImage = (typeof hero.images)[number];
 
 const generic = wa(`Halo ${site.name}, saya mau tanya-tanya dulu.`);
-const favors = menu.items.filter((it) => it.cat === 'Kopi').slice(0, 3);
-const dishLink = (it) => wa(`Halo ${site.name}, saya mau pesan ${it.name} (reguler). Atas nama: `);
+const best = menu.bestNames
+  .map((n) => menu.items.find((it) => it.name === n))
+  .filter((it): it is MenuItem => it !== undefined);
+const orderLink = (it: MenuItem) => wa(`Halo ${site.name}, saya mau pesan ${it.name} (reguler). Atas nama: `);
+
+const [main, ...side] = hero.images;
+const orbStyle = (im: HeroImage) => `--pos:${im.pos ?? '50% 50%'};--zoom:${im.zoom ?? 1}`;
+
+// ikon kategori; kategori baru yang belum punya ikon memakai ikon Kopi
+const icons: Record<string, string> = {
+  Promo:
+    '<path d="M3 12.2V4.5A1.5 1.5 0 0 1 4.5 3h7.7a1.5 1.5 0 0 1 1.06.44l7.3 7.3a1.5 1.5 0 0 1 0 2.12l-7.7 7.7a1.5 1.5 0 0 1-2.12 0l-7.3-7.3A1.5 1.5 0 0 1 3 12.2Z"/><circle cx="8" cy="8" r="1.3"/>',
+  Kopi:
+    '<path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9Z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H15.6"/><path d="M8 3.5c0 1.2 1 1.3 1 2.5M12 3.5c0 1.2 1 1.3 1 2.5"/>',
+  'Non kopi':
+    '<path d="M6.5 8h11l-1.2 11.2a1.5 1.5 0 0 1-1.5 1.3H9.2a1.5 1.5 0 0 1-1.5-1.3L6.5 8Z"/><path d="M12.5 8 14 3h3"/><path d="M7.2 13h9.6"/>',
+  Cemilan:
+    '<path d="M6 20v-8.5A3.5 3.5 0 0 1 4.5 9 3.5 3.5 0 0 1 8 5.5h8A3.5 3.5 0 0 1 19.5 9 3.5 3.5 0 0 1 18 11.5V20H6Z"/>',
+};
 ---
 
 <Layout title="Profil">
   <section class="hero">
-    <div class="hero-wrap">
-      <div class="hero-grid">
-        <div class="hero-copy">
-          <h1>
-            <span>{hero.headline[0]}</span>
-            <span class="h-italic">{hero.headline[1]}</span>
-          </h1>
-          <p class="lede">{hero.text}</p>
-          <a class="btn" href="/menu"><span>{hero.cta}</span><svg viewBox="0 0 14 10" width="14" height="10" aria-hidden="true"><path d="M0 5h12M8 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
-        </div>
+    <div class="hero-shapes" aria-hidden="true">
+      <i class="sh sh-a"></i><i class="sh sh-b"></i><i class="sh sh-c"></i><i class="sh sh-d"></i><i class="sh sh-e"></i>
+    </div>
 
-        <div class="hero-figure">
-          <figure class="frame">
-            <img src={hero.image} alt={hero.alt} width="1000" height="1000" fetchpriority="high" />
-          </figure>
-        </div>
+    <div class="hero-in">
+      <figure class="orb orb-main" style={orbStyle(main)}>
+        <img src={main.src} alt={main.alt} width="1000" height="1000" fetchpriority="high" />
+      </figure>
+
+      <div class="hero-copy">
+        <h1>
+          <span class="h-caps">{hero.headline[0]}</span>
+          <span class="h-italic">{hero.headline[1]}</span>
+        </h1>
+        <p class="lede">{hero.text}</p>
+        <a class="promo" href="/menu">
+          <small>{hero.badge.label}</small>
+          <strong>{hero.badge.text}</strong>
+        </a>
       </div>
+
+      <div class="hero-side">
+        {side.map((im) => (
+          <figure class="orb orb-sm" style={orbStyle(im)}>
+            <img src={im.src} alt={im.alt} width="1000" height="1000" />
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="shelf">
+    <div class="shelf-card">
+      <div class="shelf-top">
+        <div class="shelf-title">
+          <h2>{shelf.title}</h2>
+          <p>{shelf.sub}</p>
+        </div>
+        <nav class="cats" aria-label="Kategori menu">
+          {menuCats.map((c) => (
+            <a class="cat" href={`/menu#${encodeURIComponent(c)}`}>
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons[c] ?? icons.Kopi}></svg>
+              <span>{c}</span>
+            </a>
+          ))}
+        </nav>
+      </div>
+
+      <h3 class="shelf-sub">{shelf.bestHeading}</h3>
+      <div class="best">
+        {best.map((it, i) => (
+          <a class="bcard" href={orderLink(it)} data-reveal style={`--d:${i}`}>
+            <span class="bcard-img">
+              <img src={it.image} alt={it.name} width="800" height="800" loading="lazy" />
+            </span>
+            <span class="bcard-cat">{it.cat}</span>
+            <span class="bcard-name">{it.name}</span>
+            <span class="bcard-foot">
+              <span class="bcard-price">{rupiah(it.price)}</span>
+              <span class="add" aria-hidden="true">
+                <svg viewBox="0 0 12 12" width="12" height="12"><path d="M6 1v10M1 6h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+            </span>
+          </a>
+        ))}
+      </div>
+
+      <a class="pill" href="/menu">{shelf.all}</a>
     </div>
   </section>
 
@@ -41,28 +112,6 @@ const dishLink = (it) => wa(`Halo ${site.name}, saya mau pesan ${it.name} (regul
       </p>
       <a class="letter-link" href={generic}>{letter.stripText} {site.phoneShown}<svg viewBox="0 0 14 10" width="14" height="10" aria-hidden="true"><path d="M0 5h12M8 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
     </div>
-  </section>
-
-  <section class="menu-teaser">
-    <div class="section-head">
-      <p class="meta">Menu favorit</p>
-      <h2 data-reveal>Paling sering dipesan</h2>
-    </div>
-    <div class="dish-grid dish-grid-3">
-      {favors.map((it, i) => (
-        <a class="dish" href={dishLink(it)} data-reveal style={`--d:${i}`} data-cat={it.cat}>
-          <span class="dish-img">
-            <img src={it.image} alt={it.name} width="800" height="800" loading="lazy" />
-          </span>
-          <span class="dish-body">
-            <span class="dish-name">{it.name}</span>
-            <span class="dish-desc">{it.desc}</span>
-            <span class="dish-price">Mulai dari {rupiah(it.price)}</span>
-          </span>
-        </a>
-      ))}
-    </div>
-    <a class="t-link" href="/menu">Lihat semua menu<svg viewBox="0 0 14 10" width="14" height="10" aria-hidden="true"><path d="M0 5h12M8 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
   </section>
 
   <section class="strip">

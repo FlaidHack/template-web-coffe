@@ -19,10 +19,22 @@ export const site = {
 export const hero = {
   headline: ['Kopi lokal,', 'baru diseduh.'],
   text: 'YuCoffe menyeduh kopi petani lokal tiap hari — digelas, dicup, siap dibawa. Pilih menumu, panas atau dingin, lalu pesan lewat WhatsApp untuk diambil atau diantar.',
-  cta: 'Lihat menu',
-  // foto persegi 1:1, minimal 1000px — taruh di public/images/hero.jpg
-  image: '/images/hero.jpg',
-  alt: 'Foto contoh untuk kartu pembuka',
+  badge: { label: 'Paket hemat', text: 'Hemat Rp 9.000' },
+  // tiga foto bulat: yang pertama besar di kiri, dua lainnya kecil di kanan.
+  // pos = bagian foto yang tampil, zoom = pembesaran (opsional)
+  images: [
+    { src: '/images/hero.jpg', alt: 'Latte art dituang dari pitcher', pos: '50% 66%' },
+    { src: '/images/hero.jpg', alt: '', pos: '58% 24%', zoom: 1.15 },
+    { src: '/images/hero.jpg', alt: '', pos: '96% 94%', zoom: 1.5 },
+  ],
+};
+
+// panel di bawah hero
+export const shelf = {
+  title: 'Menu',
+  sub: 'Mau pesan apa hari ini?',
+  bestHeading: 'Paling laris di YuCoffe',
+  all: 'Lihat semua',
 };
 
 export const nav = [
@@ -35,6 +47,8 @@ export const menuCats = ['Promo', 'Kopi', 'Non kopi', 'Cemilan'];
 
 export const menu = {
   heading: 'Menu kopi',
+  // nama menu yang tampil di "Paling laris" (beranda), harus sama persis dengan name di items
+  bestNames: ['Kopi Susu Aren', 'Americano', 'Cappuccino', 'Roti Bakar Aren'],
   items: [
     {
       cat: 'Promo',
